@@ -160,7 +160,9 @@ SELECT * FROM tb_clientes
     
 SELECT nome FROM tb_promocao
     WHERE nome LIKE '%\%%' ESCAPE '\';
-    
+
+''
+   
 SELECT * FROM tb_clientes
     WHERE id_cliente IN (2, 3, 5);
     
