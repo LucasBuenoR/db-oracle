@@ -296,4 +296,200 @@ FROM tb_produtos p, tb_tipos_produtos pt
     WHERE p.id_tipo_produto (+) = pt.id_tipo_produto
 ORDER BY p.nm_produto;
 
+--limitacoes das joins externas
+SELECT p.nm_produto, 
+       pt.nm_tipo_produto
+FROM tb_produtos p, tb_tipos_produtos pt
+    WHERE p.id_tipo_produto (+) = pt.id_tipo_produto (+);
+/*
+ORA-01468: a predicate may reference only one outer-joined table
+01468. 00000 -  "a predicate may reference only one outer-joined table"
+*Cause:    
+*Action:
+Error at Line: 308 Column: 33
+*/
+
+SELECT p.nm_produto,
+       pt.nm_tipo_produto
+FROM tb_produtos p, tb_tipos_produtos pt
+    WHERE p.id_tipo_produto (+) IN (1,2,3,4);
+
+SELECT p.nm_produto,
+       pt.nm_tipo_produto
+FROM tb_produtos p, tb_tipos_produtos pt
+    WHERE p.id_tipo_produto (+) = pt.id_tipo_produto
+        OR p.id_tipo_produto = 1;
+/*
+ORA-01719: outer join operator (+) not allowed in operand of OR or IN
+01719. 00000 -  "outer join operator (+) not allowed in operand of OR or IN"
+*Cause:    An outer join appears in an or clause.
+*Action:   If A and B are predicates, to get the effect of (A(+) or B),
+           try (select where (A(+) and not B)) union all (select where (B)).
+Error at Line: 318 Column: 33
+*/
+
+
+--autojoins
+SELECT e.nome || ' ' || e.sobrenome || ' trabalha para ' || f.nome || ' ' || f.sobrenome
+FROM tb_funcionarios e, tb_funcionarios f
+    WHERE e.id_gerente = f.id_funcionario
+ORDER BY e.nome;
+
+--recuperando o id_gerente NULL
+SELECT e.sobrenome || ' trabalha para ' || NVL(f.sobrenome, 'os acionistas ')
+FROM tb_funcionarios e, tb_funcionarios f
+    WHERE e.id_gerente = f.id_funcionario (+)
+ORDER BY e.sobrenome;
+
+
+--realizando joins usando a sintaxe SQL/92
+SELECT p.nm_produto, 
+       pt.nm_tipo_produto
+FROM tb_produtos p, tb_tipos_produtos pt
+    WHERE p.id_tipo_produto = pt.id_tipo_produto
+ORDER BY p.nm_produto;
+
+--SQL/92
+SELECT p.nm_produto,
+       pt.nm_tipo_produto
+FROM tb_produtos p
+    INNER JOIN tb_tipos_produtos pt
+        ON (p.id_tipo_produto = pt.id_tipo_produto)
+ORDER BY p.nm_produto;
+
+SELECT e.nome,
+       e.sobrenome,
+       e.cargo,
+       e.salario,
+       g.id_salario
+FROM tb_funcionarios e, tb_grades_salarios g
+    WHERE e.salario 
+        BETWEEN g.base_salario AND g.teto_salario
+ORDER BY id_salario;
+
+--SQL/92
+SELECT e.nome,
+       e.sobrenome,
+       e.cargo,
+       e.salario,
+       g.id_salario
+FROM tb_funcionarios e
+    INNER JOIN tb_grades_salarios g
+        ON (e.salario BETWEEN g.base_salario AND g.teto_salario)
+ORDER BY id_salario;
+
+--simplificando joins USING
+SELECT p.nm_produto,
+       pt.nm_tipo_produto
+FROM tb_produtos p
+    INNER JOIN tb_tipos_produtos pt
+    USING(id_tipo_produto);
+
+SELECT p.nm_produto,
+       pt.nm_tipo_produto,
+       id_tipo_produto
+FROM tb_produtos p
+    INNER JOIN tb_tipos_produtos pt
+    USING(id_tipo_produto);
+    
+SELECT p.nm_produto,
+       pt.nm_tipo_produto,
+       p.id_tipo_produto
+FROM tb_produtos p
+    INNER JOIN tb_tipos_produtos pt
+    USING(id_tipo_produto);
+/*
+ORA-25154: column part of USING clause cannot have qualifier
+25154. 00000 -  "column part of USING clause cannot have qualifier"
+*Cause:    Columns that are used for a named-join (either a NATURAL join
+           or a join with a USING clause) cannot have an explicit qualifier.
+*Action:   Remove the qualifier.
+Error at Line: 402 Column: 8
+*/
+
+SELECT p.nm_produto,
+       pt.nm_tipo_produto,
+       p.id_tipo_produto
+FROM tb_produtos p
+    INNER JOIN tb_tipos_produtos pt
+    USING(p.id_tipo_produto);
+/*
+ORA-01748: only simple column names allowed here
+01748. 00000 -  "only simple column names allowed here"
+*Cause:    
+*Action:
+Error at Line: 420 Column: 12
+*/
+
+--joins mais de duas tabelas SQL/92
+SELECT c.nome,
+       c.sobrenome,
+       p.nm_produto AS PRODUTO,
+       pt.nm_tipo_produto AS TIPO
+FROM tb_clientes c, 
+     tb_compras co, 
+     tb_produtos p, 
+     tb_tipos_produtos pt
+    WHERE c.id_cliente = co.id_cliente
+        AND p.id_produto = co.id_produto
+        AND p.id_tipo_produto = pt.id_tipo_produto
+ORDER BY p.nm_produto;
+
+--SQL/92
+SELECT c.nome,
+       c.sobrenome,
+       p.nm_produto AS PRODUTO,
+       pt.nm_tipo_produto AS TIPO
+FROM tb_clientes c
+     INNER JOIN tb_compras co
+        USING (id_cliente)
+     INNER JOIN tb_produtos p
+        USING (id_produto)
+     INNER JOIN tb_tipos_produtos pt
+        USING (id_tipo_produto)
+ORDER BY p.nm_produto;
+
+
+--realizando joins externas usando SQL/92
+
+--LEFT
+SELECT p.nm_produto,
+       pt.nm_tipo_produto
+FROM tb_produtos p
+    LEFT OUTER JOIN tb_tipos_produtos pt
+        USING (id_tipo_produto)
+ORDER BY p.nm_produto;
+
+--RIGHT
+SELECT p.nm_produto,
+       pt.nm_tipo_produto
+FROM tb_produtos p
+    RIGHT OUTER JOIN tb_tipos_produtos pt
+        USING (id_tipo_produto)
+ORDER BY p.nm_produto;
+
+--FULL
+SELECT p.nm_produto,
+       pt.nm_tipo_produto
+FROM tb_produtos p
+    FULL OUTER JOIN tb_tipos_produtos pt
+        USING (id_tipo_produto)
+ORDER BY p.nm_produto;
+
+--autojoins SQL/92
+SELECT e.nome || ' ' || e.sobrenome || ' trabalha para ' || f.nome || ' ' || f.sobrenome
+FROM tb_funcionarios e
+    INNER JOIN tb_funcionarios f
+        ON (e.id_gerente = f.id_funcionario)
+ORDER BY e.nome;
+
+-- join cruzada SQL/92
+SELECT * FROM tb_tipos_produtos CROSS JOIN tb_produtos;
+
+
+/*
+Capitulo IV
+Usando funcoes simples
+*/
+
        
