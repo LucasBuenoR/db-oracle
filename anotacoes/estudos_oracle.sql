@@ -492,4 +492,102 @@ Capitulo IV
 Usando funcoes simples
 */
 
+--funcoes de caracteres
+
+--ASCII
+SELECT ASCII('a'),
+       ASCII('A'),
+       ASCII('z'),
+       ASCII('Z'),
+       ASCII(0),
+       ASCII(9)
+FROM DUAL;
+
+--CHR
+SELECT CHR(97),
+       CHR(65),
+       CHR(122),
+       CHR(90),
+       CHR(48),
+       CHR(57)
+FROM DUAL;
+
+--CONCAT
+SELECT CONCAT(nome, sobrenome)
+FROM tb_clientes;
+
+--INITCAP
+SELECT id_produto, INITCAP(ds_produto)
+FROM tb_produtos
+WHERE id_produto < 4;
+
+--INSTR
+SELECT nm_produto, INSTR(nm_produto, 'Science')
+FROM tb_produtos
+WHERE id_produto = 1;
+
+SELECT nm_produto, INSTR(nm_produto, 'e', 1, 2)
+FROM tb_produtos
+WHERE id_produto = 1;
+
+SELECT id_cliente, dt_nascimento, INSTR(dt_nascimento, 'JAN')
+FROM tb_clientes
+WHERE id_cliente = 1;
+
+--LENGTH
+SELECT nm_produto, LENGTH(nm_produto)
+FROM tb_produtos;
+
+SELECT preco, LENGTH(preco)
+FROM tb_produtos
+WHERE id_produto < 3;
+
+--LOWER E UPPER
+SELECT UPPER(nome), LOWER(sobrenome)
+FROM tb_clientes;
+
+--LPAD E RPAD
+SELECT RPAD(nm_produto, 30, '.'), LPAD(preco, 8, '*+')
+FROM tb_produtos
+WHERE id_produto < 4;
+
+--LTRIM, RTRIM E TRIM
+SELECT LTRIM('  Hello Gail Seymour!'),
+       RTRIM('Hi Doreen Oakley!abcabc', 'abc'),
+       TRIM('0' FROM '000Hey Steve Button!00000')
+FROM DUAL;
+
+--NVL
+SELECT id_cliente, NVL(telefone, 'numero desconhecido')
+FROM tb_clientes;
+
+--NVL2
+SELECT id_cliente, NVL2(telefone, 'tem numero', 'nao tem numero')
+FROM tb_clientes;
+
+--REPLACE
+SELECT REPLACE(nm_produto, 'Science', 'Physics')
+FROM tb_produtos
+WHERE id_produto = 1;
+
+--SOUNDEX
+SELECT sobrenome FROM tb_clientes
+WHERE SOUNDEX(sobrenome) = SOUNDEX('whyte');
+
+SELECT sobrenome
+FROM tb_clientes
+WHERE SOUNDEX(sobrenome) = SOUNDEX('bloo');
+
+--SUBSTR
+SELECT SUBSTR(nm_produto, 2, 7)
+FROM tb_produtos
+WHERE id_produto < 4;
+
+SELECT SUBSTR('Mary had a little lamb', 12, 6)
+FROM DUAL;
+
+--COMBINANDO FUNCOES
+SELECT nm_produto, UPPER(SUBSTR(nm_produto, 2, 8))
+FROM tb_produtos
+WHERE id_produto < 4;
        
